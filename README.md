@@ -16,6 +16,6 @@ The project description is split into six parts:
 * Computation of Momenta
 * Computation of Position and Quaternion
 
-An initial estimate for this project will be a beefy six months. This sounds a little like sandbagging but since this is based around trying to learn as much as possible, I think it is quite reasonable. This estimate essentially provides one month for each section of the project. This will allow time for learning, failure, experimentation, comparison, profiling and testing the techniques described in the original document.
+An initial estimate for this project will be three months. This estimate essentially provides for approximately two weeks per section of the project. This will allow time for learning, failure, experimentation, comparison, profiling and testing the techniques described in the original document.
 
 
