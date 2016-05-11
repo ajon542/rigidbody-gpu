@@ -44,6 +44,10 @@ public class RunCompute : MonoBehaviour
 
             // Obtain the data.
             // NOTE: This is inefficient as it is essentially copying the data from the GPU.
+            // Depending on what is being done, copying the data to system memory does not
+            // even need to occur. For example, if we wanted to use the buffer in a shader,
+            // we could simply do "material.SetBuffer("buffer", buffer);". Alternatively, we
+            // could pass the buffer along to another compute shader.
             buffer.GetData(data);
 
             // Display the data.
