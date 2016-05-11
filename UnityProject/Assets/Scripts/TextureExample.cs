@@ -9,8 +9,6 @@ public class TextureExample : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(wang_hash(0));
-
         tex = new RenderTexture(64, 64, 0);
         tex.enableRandomWrite = true;
         tex.Create();
