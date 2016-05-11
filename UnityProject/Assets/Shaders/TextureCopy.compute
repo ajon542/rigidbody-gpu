@@ -1,0 +1,16 @@
+﻿#pragma kernel CSMain
+
+RWTexture2D<float4> texCopy;
+Texture2D<float4> tex;
+
+[numthreads(8,8,1)]
+void CSMain (uint2 id : SV_DispatchThreadID)
+{
+    float4 t = tex[id];
+
+    t.r += 0.1;
+    t.g += 0.1;
+    t.b += 0.1;
+
+    texCopy[id] = t;
+}
