@@ -3,7 +3,7 @@
 /// <summary>
 /// Example of running a simple compute shader to fill a buffer.
 /// </summary>
-public class RunCompute : MonoBehaviour
+public class BufferExample : MonoBehaviour
 {
     public ComputeShader shader;
     private ComputeBuffer buffer;
