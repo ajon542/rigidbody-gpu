@@ -3,84 +3,163 @@
 RWTexture2D<float4> texCopy;
 Texture2D<float4> tex;
 
+uint2 GetNeighbor(uint2 id, int2 neighbor)
+{
+    float w, h;
+    tex.GetDimensions(w, h);
+
+    int newX = id.x + neighbor.x;
+    if(newX < 0)
+    {
+        newX += (int)w;
+    }
+    if(newX >= w)
+    {
+        newX -= (int)w;
+    }
+    int newY = id.y + neighbor.y;
+    if(newY < 0)
+    {
+        newY += (int)h;
+    }
+    if(newY >= h)
+    {
+        newY -= (int)h;
+    }
+
+    return uint2(newX, newY);
+}
+
+
 uint NeighborCount(uint2 id)
 {
     uint count = 0;
-    uint2 n;
-    uint2 t;
-    n = uint2(-1, 1);
-    t = id + n;
-    count += step(0.5, t.x);
+    uint2 neighbor;
+
+    neighbor = GetNeighbor(id, int2(-1, 1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
     
-    n = uint2( 0, 1);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2( 0, 1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
 
-    n = uint2( 1, 1);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2( 1, 1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
 
-    n = uint2( 1, 0);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2( 1, 0));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
 
-    n = uint2( 1,-1);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2( 1,-1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
     
-    n = uint2( 0,-1);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2( 0,-1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
 
-    n = uint2(-1,-1);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2(-1,-1));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
     
-    n = uint2(-1, 0);
-    t = id + n;
-    count += step(0.5, t.x);
+    neighbor = GetNeighbor(id, int2(-1, 0));
+    if(tex[neighbor].r == 0)
+    {
+        count++;
+    }
 
     return count;
+}
+
+float4 SampleColor(uint2 id)
+{
+    float w, h;
+    tex.GetDimensions(w, h);
+
+    uint count = NeighborCount(id);
+
+    float4 col = tex[id];
+    if(count == 0)
+    {
+        col = float4(0.5, 0.5, 0.5, 1); // grey
+    }
+    if(count == 1)
+    {
+        col = float4(1, 0, 0, 1); // red
+    }
+    if(count == 2)
+    {
+        col = float4(0, 1, 0, 1); // green
+    }
+    if(count == 3)
+    {
+        col = float4(0, 0, 1, 1); // blue
+    }
+    if(count == 4)
+    {
+        col = float4(0, 1, 1, 1); // light blue
+    }
+    if(count == 5)
+    {
+        col = float4(1, 0, 1, 1); // pink
+    }
+    if(count == 6)
+    {
+        col = float4(1, 1, 0, 1); // yellow
+    }
+    if(count == 7)
+    {
+        col = float4(1, 1, 1, 1); // white
+    }
+    if(count == 8)
+    {
+        col = float4(0, 0, 0, 1); // black
+    }
+    return col;
 }
 
 [numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    uint neighborCount = NeighborCount(id);
+    //texCopy[id] = SampleColor(id);
+
     uint cellExists = tex[id].r;
+    uint neighborCount = NeighborCount(id);
 
-    float4 col = float4(0, 1, 0, 1); // green
-    if(neighborCount == 8)
-        col = float4(1, 0, 0, 1);    // red
-    //if(neighborCount == 7)
-    //    col = float4(0, 0, 1, 1);    // blue
-    if(neighborCount == 6)
-        col = float4(0, 1, 1, 1);    // light blue
-    if(neighborCount == 5)
-        col = float4(1, 1, 0, 1);    // yellow
+    if(cellExists == 1)
+    {
+        if (neighborCount < 2) {
+            cellExists = 1;
+        }
+        if (neighborCount == 2 || neighborCount == 3) {
+            cellExists = 0;
+        }
+        if (neighborCount > 3) {
+            cellExists = 1;
+        }
+    }
+    else
+    {
+        if(neighborCount == 3) {
+            cellExists = 1;
+        }
+    }
 
-    texCopy[id] = col;
-
-    //texCopy[id] = tex[id];
-
-    //if(cellExists == 1)
-    //{
-    //    if (neighborCount < 2) {
-    //        cellExists = 0;
-    //    }
-    //    if (neighborCount == 2 || neighborCount == 3) {
-    //        cellExists = 1;
-    //    }
-    //    if (neighborCount > 3) {
-    //        cellExists = 0;
-    //    }
-    //}
-    //else
-    //{
-    //    if(neighborCount == 3) {
-    //        cellExists = 0;
-    //    }
-    //}
-
-    //texCopy[id] = float4(cellExists, cellExists, cellExists, 1);
+    texCopy[id] = float4(cellExists, cellExists, cellExists, 1);
 }
