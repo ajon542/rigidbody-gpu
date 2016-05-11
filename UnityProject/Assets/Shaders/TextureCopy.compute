@@ -3,14 +3,84 @@
 RWTexture2D<float4> texCopy;
 Texture2D<float4> tex;
 
+uint NeighborCount(uint2 id)
+{
+    uint count = 0;
+    uint2 n;
+    uint2 t;
+    n = uint2(-1, 1);
+    t = id + n;
+    count += step(0.5, t.x);
+    
+    n = uint2( 0, 1);
+    t = id + n;
+    count += step(0.5, t.x);
+
+    n = uint2( 1, 1);
+    t = id + n;
+    count += step(0.5, t.x);
+
+    n = uint2( 1, 0);
+    t = id + n;
+    count += step(0.5, t.x);
+
+    n = uint2( 1,-1);
+    t = id + n;
+    count += step(0.5, t.x);
+    
+    n = uint2( 0,-1);
+    t = id + n;
+    count += step(0.5, t.x);
+
+    n = uint2(-1,-1);
+    t = id + n;
+    count += step(0.5, t.x);
+    
+    n = uint2(-1, 0);
+    t = id + n;
+    count += step(0.5, t.x);
+
+    return count;
+}
+
 [numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    float4 t = tex[id];
+    uint neighborCount = NeighborCount(id);
+    uint cellExists = tex[id].r;
 
-    t.r += 0.1;
-    t.g += 0.1;
-    t.b += 0.1;
+    float4 col = float4(0, 1, 0, 1); // green
+    if(neighborCount == 8)
+        col = float4(1, 0, 0, 1);    // red
+    //if(neighborCount == 7)
+    //    col = float4(0, 0, 1, 1);    // blue
+    if(neighborCount == 6)
+        col = float4(0, 1, 1, 1);    // light blue
+    if(neighborCount == 5)
+        col = float4(1, 1, 0, 1);    // yellow
 
-    texCopy[id] = t;
+    texCopy[id] = col;
+
+    //texCopy[id] = tex[id];
+
+    //if(cellExists == 1)
+    //{
+    //    if (neighborCount < 2) {
+    //        cellExists = 0;
+    //    }
+    //    if (neighborCount == 2 || neighborCount == 3) {
+    //        cellExists = 1;
+    //    }
+    //    if (neighborCount > 3) {
+    //        cellExists = 0;
+    //    }
+    //}
+    //else
+    //{
+    //    if(neighborCount == 3) {
+    //        cellExists = 0;
+    //    }
+    //}
+
+    //texCopy[id] = float4(cellExists, cellExists, cellExists, 1);
 }
