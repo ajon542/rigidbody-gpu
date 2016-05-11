@@ -27,6 +27,10 @@ public class RunCompute : MonoBehaviour
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
+        // Create some initial data.
+        int[] initialBufferData = new int[] { 10, 20, 30, 40, 50, 60, 70, 80 };
+        buffer.SetData(initialBufferData);
+
         // Set the buffer on the compute shader.
         shader.SetBuffer(kernelHandle, "buffer", buffer);
     }
