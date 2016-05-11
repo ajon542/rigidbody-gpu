@@ -9,6 +9,8 @@ public class TextureExample : MonoBehaviour
 
     void Start()
     {
+        Debug.Log(wang_hash(0));
+
         tex = new RenderTexture(64, 64, 0);
         tex.enableRandomWrite = true;
         tex.Create();
@@ -36,7 +38,7 @@ public class TextureExample : MonoBehaviour
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.A))
+        //if(Input.GetKeyDown(KeyCode.A))
         {
             Swap(ref tex, ref texCopy);
             shaderCopy.SetTexture(0, "tex", tex);

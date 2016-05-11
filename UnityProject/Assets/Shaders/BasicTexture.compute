@@ -8,15 +8,31 @@ void CSMain (uint2 id : SV_DispatchThreadID)
     float w, h;
     tex.GetDimensions(w, h);
 
-    //float w_d = step(0.5, (id.x / w) * (id.y / h));
-    //float4 col = float4(w_d, w_d, w_d, 1);
+    float4 col = float4(0, 0, 0, 1);
 
-    float4 col = float4(1, 1, 1, 1);
-    if(id.x > 30 && id.x < 40 && id.y > 30 && id.y < 40)
+    if(id.x == 0 || id.x == 10 || id.x == 11)
+    {
+        col = float4(1, 1, 1, 1);
+    }
+    if(id.y == 50 || id.y == 63)
+    {
+        col = float4(1, 1, 1, 1);
+    }
+
+    if(id.x >= 20 && id.x < 50 && id.y >= 20 && id.y < 50)
+    {
+        col = float4(1, 1, 1, 1);
+    }
+
+    if(id.x >= 30 && id.x < 40 && id.y >= 30 && id.y < 40)
     {
         col = float4(0, 0, 0, 1);
     }
 
-    //tex[id] = float4(id.x / w, id.y / h,  0.0, 1.0);
+    if(id.x >= 35 && id.x < 38 && id.y >= 35 && id.y < 38)
+    {
+        col = float4(1, 1, 1, 1);
+    }
+
     tex[id] = col;
 }

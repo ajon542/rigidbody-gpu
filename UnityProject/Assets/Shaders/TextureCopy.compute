@@ -137,12 +137,11 @@ float4 SampleColor(uint2 id)
 [numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    //texCopy[id] = SampleColor(id);
-
+    // White is 1, black is 0... so cell exists is 0.
     uint cellExists = tex[id].r;
     uint neighborCount = NeighborCount(id);
 
-    if(cellExists == 1)
+    if(cellExists == 0)
     {
         if (neighborCount < 2) {
             cellExists = 1;
@@ -157,9 +156,11 @@ void CSMain (uint2 id : SV_DispatchThreadID)
     else
     {
         if(neighborCount == 3) {
-            cellExists = 1;
+            cellExists = 0;
         }
     }
 
     texCopy[id] = float4(cellExists, cellExists, cellExists, 1);
+
+    //texCopy[id] = tex[id];
 }
