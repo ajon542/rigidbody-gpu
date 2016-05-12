@@ -17,6 +17,9 @@ public class TextureExample : MonoBehaviour
         texCopy.enableRandomWrite = true;
         texCopy.Create();
 
+        float value = Random.value;
+        Debug.Log(value);
+        shader.SetFloat("seed", value);
         shader.SetTexture(0, "tex", tex);
         shader.Dispatch(0, tex.width / 8, tex.height / 8, 1);
 

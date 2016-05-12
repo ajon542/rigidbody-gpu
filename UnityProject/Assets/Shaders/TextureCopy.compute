@@ -30,7 +30,6 @@ uint2 GetNeighbor(uint2 id, int2 neighbor)
     return uint2(newX, newY);
 }
 
-
 uint NeighborCount(uint2 id)
 {
     uint count = 0;

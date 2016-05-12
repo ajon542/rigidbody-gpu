@@ -1,38 +1,16 @@
 ﻿#pragma kernel CSMain
 
 RWTexture2D<float4> tex;
+float seed;
+
+float rand(float2 co){
+    return frac(sin(dot(co.xy, float2(12.9898,78.233))) * 43758.5453 * seed);
+}
 
 [numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    float w, h;
-    tex.GetDimensions(w, h);
-
-    float4 col = float4(0, 0, 0, 1);
-
-    if(id.x == 0 || id.x == 10 || id.x == 11)
-    {
-        col = float4(1, 1, 1, 1);
-    }
-    if(id.y == 50 || id.y == 63)
-    {
-        col = float4(1, 1, 1, 1);
-    }
-
-    if(id.x >= 20 && id.x < 50 && id.y >= 20 && id.y < 50)
-    {
-        col = float4(1, 1, 1, 1);
-    }
-
-    if(id.x >= 30 && id.x < 40 && id.y >= 30 && id.y < 40)
-    {
-        col = float4(0, 0, 0, 1);
-    }
-
-    if(id.x >= 35 && id.x < 38 && id.y >= 35 && id.y < 38)
-    {
-        col = float4(1, 1, 1, 1);
-    }
-
-    tex[id] = col;
+    float r = rand(float2(id.x, id.y));
+    float v = step(r, 0.6);
+    tex[id] = float4(v, v, v, 1);
 }
