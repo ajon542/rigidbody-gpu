@@ -7,13 +7,16 @@ public class TextureExample : MonoBehaviour
 
     RenderTexture tex, texCopy;
 
+    private int textureSize = 1024;
+    private int threadGroupCount = 32;
+
     void Start()
     {
-        tex = new RenderTexture(64, 64, 0);
+        tex = new RenderTexture(textureSize, textureSize, 0);
         tex.enableRandomWrite = true;
         tex.Create();
 
-        texCopy = new RenderTexture(64, 64, 0);
+        texCopy = new RenderTexture(textureSize, textureSize, 0);
         texCopy.enableRandomWrite = true;
         texCopy.Create();
 
@@ -21,11 +24,11 @@ public class TextureExample : MonoBehaviour
         Debug.Log(value);
         shader.SetFloat("seed", value);
         shader.SetTexture(0, "tex", tex);
-        shader.Dispatch(0, tex.width / 8, tex.height / 8, 1);
+        shader.Dispatch(0, threadGroupCount, threadGroupCount, 1);
 
         shaderCopy.SetTexture(0, "tex", tex);
         shaderCopy.SetTexture(0, "texCopy", texCopy);
-        shaderCopy.Dispatch(0, texCopy.width / 8, texCopy.height / 8, 1);
+        shaderCopy.Dispatch(0, threadGroupCount, threadGroupCount, 1);
     }
 
     void OnGUI()

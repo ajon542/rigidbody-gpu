@@ -7,10 +7,35 @@ float rand(float2 co){
     return frac(sin(dot(co.xy, float2(12.9898,78.233))) * 43758.5453 * seed);
 }
 
-[numthreads(8,8,1)]
+// Create the initial texture.
+//
+[numthreads(32,32,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    float r = rand(float2(id.x, id.y));
-    float v = step(r, 0.6);
-    tex[id] = float4(v, v, v, 1);
+    // Random isn't anywhere near as exciting as I thought it would be.
+    //float r = rand(float2(id.x, id.y));
+    //float v = step(r, 0.6);
+
+    //tex[id] = float4(v, v, v, 1);
+
+    // Some concentric square pattern to make it a little more interesting.
+    if(id.x >= 100 && id.x < 900 && id.y >= 100 && id.y < 900)
+    {
+        tex[id] = float4(0, 0, 0, 1);
+    }
+
+    if(id.x >= 200 && id.x < 800 && id.y >= 200 && id.y < 800)
+    {
+        tex[id] = float4(1, 1, 1, 1);
+    }
+
+    if(id.x >= 300 && id.x < 700 && id.y >= 300 && id.y < 700)
+    {
+        tex[id] = float4(0, 0, 0, 1);
+    }
+
+    if(id.x >= 400 && id.x < 600 && id.y >= 400 && id.y < 600)
+    {
+        tex[id] = float4(1, 1, 1, 1);
+    }
 }

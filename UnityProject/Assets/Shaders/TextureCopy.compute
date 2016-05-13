@@ -86,6 +86,7 @@ uint NeighborCount(uint2 id)
     return count;
 }
 
+// Debugging method.
 float4 SampleColor(uint2 id)
 {
     float w, h;
@@ -133,7 +134,7 @@ float4 SampleColor(uint2 id)
     return col;
 }
 
-[numthreads(8,8,1)]
+[numthreads(32,32,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
     // White is 1, black is 0... so cell exists is 0.
