@@ -3,14 +3,15 @@
 RWTexture2D<float4> texCopy;
 Texture2D<float4> tex;
 
-uint2 GetNeighbor(uint2 id, int2 neighbor)
+uint2 GetNeighborFast(uint2 id, int2 neighbor)
 {
-    float w, h;
-    tex.GetDimensions(w, h);
+    int newX = id.x + neighbor.x;
+    int newY = id.x + neighbor.y;
+    return uint2(newX, newY);
+}
 
-    // TODO: How to remove these checks for every texture coord?
-    // This wrapping only needs to occur for the boundary texture coords.
-    // Could we utilize another shader program just for the boundary texture coords?
+uint2 GetNeighbor(uint2 id, int2 neighbor, uint w, uint h)
+{
     int newX = id.x + neighbor.x;
     if(newX < 0)
     {
@@ -35,131 +36,61 @@ uint2 GetNeighbor(uint2 id, int2 neighbor)
 
 uint NeighborCount(uint2 id)
 {
+    uint w, h;
+    tex.GetDimensions(w, h);
+
     uint count = 0;
     uint2 neighbor;
 
-    neighbor = GetNeighbor(id, int2(-1, 1));
-    if(tex[neighbor].r == 0) // TODO: This could probably be replaced with "step". Want to investigate performance.
-    {
-        count++;
-    }
+    neighbor = GetNeighbor(id, int2(-1, 1), w, h);
+    count += tex[neighbor].r;
+
+    neighbor = GetNeighbor(id, int2( 0, 1), w, h);
+    count += tex[neighbor].r;
+
+    neighbor = GetNeighbor(id, int2( 1, 1), w, h);
+    count += tex[neighbor].r;
+
+    neighbor = GetNeighbor(id, int2( 1, 0), w, h);
+    count += tex[neighbor].r;
+
+    neighbor = GetNeighbor(id, int2( 1,-1), w, h);
+    count += tex[neighbor].r;
     
-    neighbor = GetNeighbor(id, int2( 0, 1));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
+    neighbor = GetNeighbor(id, int2( 0,-1), w, h);
+    count += tex[neighbor].r;
 
-    neighbor = GetNeighbor(id, int2( 1, 1));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
+    neighbor = GetNeighbor(id, int2(-1,-1), w, h);
+    count += tex[neighbor].r;
 
-    neighbor = GetNeighbor(id, int2( 1, 0));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
-
-    neighbor = GetNeighbor(id, int2( 1,-1));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
-    
-    neighbor = GetNeighbor(id, int2( 0,-1));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
-
-    neighbor = GetNeighbor(id, int2(-1,-1));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
-    
-    neighbor = GetNeighbor(id, int2(-1, 0));
-    if(tex[neighbor].r == 0)
-    {
-        count++;
-    }
+    neighbor = GetNeighbor(id, int2(-1, 0), w, h);
+    count += tex[neighbor].r;
 
     return count;
-}
-
-// Debugging method.
-float4 SampleColor(uint2 id)
-{
-    float w, h;
-    tex.GetDimensions(w, h);
-
-    uint count = NeighborCount(id);
-
-    float4 col = tex[id];
-    if(count == 0)
-    {
-        col = float4(0.5, 0.5, 0.5, 1); // grey
-    }
-    if(count == 1)
-    {
-        col = float4(1, 0, 0, 1); // red
-    }
-    if(count == 2)
-    {
-        col = float4(0, 1, 0, 1); // green
-    }
-    if(count == 3)
-    {
-        col = float4(0, 0, 1, 1); // blue
-    }
-    if(count == 4)
-    {
-        col = float4(0, 1, 1, 1); // light blue
-    }
-    if(count == 5)
-    {
-        col = float4(1, 0, 1, 1); // pink
-    }
-    if(count == 6)
-    {
-        col = float4(1, 1, 0, 1); // yellow
-    }
-    if(count == 7)
-    {
-        col = float4(1, 1, 1, 1); // white
-    }
-    if(count == 8)
-    {
-        col = float4(0, 0, 0, 1); // black
-    }
-    return col;
 }
 
 [numthreads(32,32,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
-    // White is 1, black is 0... so cell exists is 0.
     uint cellExists = tex[id].r;
     uint neighborCount = NeighborCount(id);
 
-    if(cellExists == 0)
+    if(cellExists == 1)
     {
         if (neighborCount < 2) {
-            cellExists = 1;
-        }
-        if (neighborCount == 2 || neighborCount == 3) {
             cellExists = 0;
         }
-        if (neighborCount > 3) {
+        if (neighborCount == 2 || neighborCount == 3) {
             cellExists = 1;
+        }
+        if (neighborCount > 3) {
+            cellExists = 0;
         }
     }
     else
     {
         if(neighborCount == 3) {
-            cellExists = 0;
+            cellExists = 1;
         }
     }
 
