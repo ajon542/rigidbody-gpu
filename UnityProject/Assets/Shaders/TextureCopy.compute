@@ -8,6 +8,9 @@ uint2 GetNeighbor(uint2 id, int2 neighbor)
     float w, h;
     tex.GetDimensions(w, h);
 
+    // TODO: How to remove these checks for every texture coord?
+    // This wrapping only needs to occur for the boundary texture coords.
+    // Could we utilize another shader program just for the boundary texture coords?
     int newX = id.x + neighbor.x;
     if(newX < 0)
     {
@@ -36,7 +39,7 @@ uint NeighborCount(uint2 id)
     uint2 neighbor;
 
     neighbor = GetNeighbor(id, int2(-1, 1));
-    if(tex[neighbor].r == 0)
+    if(tex[neighbor].r == 0) // TODO: This could probably be replaced with "step". Want to investigate performance.
     {
         count++;
     }
