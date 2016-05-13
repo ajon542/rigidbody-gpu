@@ -9,7 +9,7 @@ float rand(float2 co){
 
 // Create the initial texture.
 //
-[numthreads(32,32,1)]
+[numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
     // Random isn't anywhere near as exciting as I thought it would be.

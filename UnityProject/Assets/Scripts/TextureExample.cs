@@ -7,8 +7,8 @@ public class TextureExample : MonoBehaviour
 
     RenderTexture tex, texCopy;
 
-    private int textureSize = 2048;
-    private int threadGroupCount = 64;
+    private int textureSize = 1024;
+    private int threadGroupCount = 128;
 
     void Start()
     {

@@ -6,7 +6,7 @@ Texture2D<float4> tex;
 uint2 GetNeighborFast(uint2 id, int2 neighbor)
 {
     int newX = id.x + neighbor.x;
-    int newY = id.x + neighbor.y;
+    int newY = id.y + neighbor.y;
     return uint2(newX, newY);
 }
 
@@ -69,7 +69,7 @@ uint NeighborCount(uint2 id)
     return count;
 }
 
-[numthreads(32,32,1)]
+[numthreads(8,8,1)]
 void CSMain (uint2 id : SV_DispatchThreadID)
 {
     uint cellExists = tex[id].r;
