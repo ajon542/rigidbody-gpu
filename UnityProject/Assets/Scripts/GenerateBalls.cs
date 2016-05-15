@@ -16,7 +16,10 @@ public class GenerateBalls : MonoBehaviour
         for (int i = 0; i < ballCount; ++i)
         {
             Vector3 randomPosition = new Vector3(Random.value * 20, Random.value * 20, Random.value * 20);
-            go = (GameObject)Instantiate(ball, randomPosition, Quaternion.identity);
+            //go = (GameObject)Instantiate(ball, randomPosition, Quaternion.identity);
+
+            go = (GameObject)Instantiate(Resources.Load("Ball15", typeof(GameObject)), randomPosition, Quaternion.identity);
+
             go.transform.parent = gameObject.transform;
             balls.Add(go);
         }
