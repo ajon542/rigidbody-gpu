@@ -10,25 +10,25 @@ uint2 GetNeighborFast(uint2 id, int2 neighbor)
     return uint2(newX, newY);
 }
 
-uint2 GetNeighbor(uint2 id, int2 neighbor, uint w, uint h)
+uint2 GetNeighbor(uint2 id, int2 neighbor, int w, int h)
 {
     int newX = id.x + neighbor.x;
     if(newX < 0)
     {
-        newX += (int)w;
+        newX += w;
     }
     if(newX >= w)
     {
-        newX -= (int)w;
+        newX -= w;
     }
     int newY = id.y + neighbor.y;
     if(newY < 0)
     {
-        newY += (int)h;
+        newY += h;
     }
     if(newY >= h)
     {
-        newY -= (int)h;
+        newY -= h;
     }
 
     return uint2(newX, newY);
