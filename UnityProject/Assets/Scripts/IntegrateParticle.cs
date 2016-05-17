@@ -5,6 +5,8 @@
 /// </summary>
 public class IntegrateParticle : MonoBehaviour
 {
+    public GameObject gameObject;
+
     struct Particle
     {
         public float mass;
@@ -40,7 +42,7 @@ public class IntegrateParticle : MonoBehaviour
         particle.mass = 2;
         particle.position = new Vector3(0, 0, 0);
         particle.velocity = new Vector3(1, 0, 0);
-        particle.acceleration = new Vector3(0, 0, -1);
+        particle.acceleration = new Vector3(-1, 0, 0);
         particle.damping = 0;
 
         // Create some initial data.
@@ -79,6 +81,8 @@ public class IntegrateParticle : MonoBehaviour
             //    Debug.Log(particles[i].position);
             //}
             Debug.Log(particles[0].position);
+
+            gameObject.transform.position = particles[0].position;
         }
     }
 
