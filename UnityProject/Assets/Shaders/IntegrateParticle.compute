@@ -2,15 +2,33 @@
 
 struct Particle
 {
+    float mass;
     float3 position;
+    float3 velocity;
+    float3 acceleration;
+    float damping;
 };
 
 RWStructuredBuffer<Particle> buffer;
+float duration;
+float3 forceAccum = float3(0, 0, 0);
 
 [numthreads(4,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
 {
-    Particle particle;
-    particle.position = float3(10, 10, 10);
-    buffer[dispatchID.x] = particle;
+    // Update linear position.
+    float3 scaledVelocity = buffer[dispatchID.x].velocity * duration;
+    buffer[dispatchID.x].position += scaledVelocity;
+
+    // Work out the acceleration from the force.
+    float3 resultingAcc = buffer[dispatchID.x].acceleration;
+    float3 scaledForce = forceAccum * (1 / buffer[dispatchID.x].mass);
+    resultingAcc += scaledForce;
+
+    // Update linear velocity from the acceleration.
+    float3 scaledAcceleration = resultingAcc * duration;
+    buffer[dispatchID.x].velocity += scaledAcceleration;
+
+    // Impose drag.
+    //Velocity *= System.Math.Pow(Damping, duration);
 }

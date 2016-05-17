@@ -7,7 +7,11 @@ public class IntegrateParticle : MonoBehaviour
 {
     struct Particle
     {
+        public float mass;
         public Vector3 position;
+        public Vector3 velocity;
+        public Vector3 acceleration;
+        public float damping;
     }
 
     public ComputeShader shader;
@@ -27,18 +31,25 @@ public class IntegrateParticle : MonoBehaviour
         particles = new Particle[bufferSize];
 
         // Create compute buffer.
-        buffer = new ComputeBuffer(bufferSize * 3, sizeof(int));
+        buffer = new ComputeBuffer(bufferSize * 11, sizeof(float));
 
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
+        Particle particle = new Particle();
+        particle.mass = 2;
+        particle.position = new Vector3(0, 0, 0);
+        particle.velocity = new Vector3(1, 0, 0);
+        particle.acceleration = new Vector3(0, 0, -1);
+        particle.damping = 0;
+
         // Create some initial data.
         Particle[] initialBufferData = new Particle[]
         {
-            new Particle { position = new Vector3(1, 1, 1) },
-            new Particle { position = new Vector3(2, 2, 2) },
-            new Particle { position = new Vector3(3, 3, 3) },
-            new Particle { position = new Vector3(4, 4, 4) },
+            particle,
+            particle,
+            particle,
+            particle,
         };
         buffer.SetData(initialBufferData);
 
@@ -48,9 +59,10 @@ public class IntegrateParticle : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
+        //if (Input.GetKeyDown(KeyCode.A))
         {
             // Fill the buffer using the compute shader.
+            shader.SetFloat("duration", Time.deltaTime);
             shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
             // Obtain the data.
@@ -62,10 +74,11 @@ public class IntegrateParticle : MonoBehaviour
             buffer.GetData(particles);
 
             // Display the data.
-            for (int i = 0; i < bufferSize; i++)
-            {
-                Debug.Log(particles[i].position);
-            }
+            //for (int i = 0; i < bufferSize; i++)
+            //{
+            //    Debug.Log(particles[i].position);
+            //}
+            Debug.Log(particles[0].position);
         }
     }
 
