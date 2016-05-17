@@ -5,30 +5,41 @@
 /// </summary>
 public class IntegrateParticle : MonoBehaviour
 {
+    struct Particle
+    {
+        public Vector3 position;
+    }
+
     public ComputeShader shader;
     private ComputeBuffer buffer;
 
     private int kernelHandle;
-    private int groupCount = 2;
+    private int groupCount = 1;
     private int threadCount = 4;
 
     private int bufferSize;
-    private int[] data;
+    private Particle[] particles;
 
     private void Start()
     {
         // Calculate the buffer size.
         bufferSize = groupCount * threadCount;
-        data = new int[bufferSize];
+        particles = new Particle[bufferSize];
 
         // Create compute buffer.
-        buffer = new ComputeBuffer(bufferSize, sizeof(int));
+        buffer = new ComputeBuffer(bufferSize * 3, sizeof(int));
 
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
         // Create some initial data.
-        int[] initialBufferData = new int[] { 10, 20, 30, 40, 50, 60, 70, 80 };
+        Particle[] initialBufferData = new Particle[]
+        {
+            new Particle { position = new Vector3(1, 1, 1) },
+            new Particle { position = new Vector3(2, 2, 2) },
+            new Particle { position = new Vector3(3, 3, 3) },
+            new Particle { position = new Vector3(4, 4, 4) },
+        };
         buffer.SetData(initialBufferData);
 
         // Set the buffer on the compute shader.
@@ -48,12 +59,12 @@ public class IntegrateParticle : MonoBehaviour
             // even need to occur. For example, if we wanted to use the buffer in a shader,
             // we could simply do "material.SetBuffer("buffer", buffer);". Alternatively, we
             // could pass the buffer along to another compute shader.
-            buffer.GetData(data);
+            buffer.GetData(particles);
 
             // Display the data.
             for (int i = 0; i < bufferSize; i++)
             {
-                Debug.Log(data[i]);
+                Debug.Log(particles[i].position);
             }
         }
     }
