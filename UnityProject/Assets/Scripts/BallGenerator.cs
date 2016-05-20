@@ -12,9 +12,10 @@ public class BallGenerator
     /// It is up to the called to destroy the game objects.
     /// </remarks>
     /// <param name="parent">The parent game object for each ball.</param>
-    /// <param name="ballCount">THe number of balls to generate.</param>
-    /// <returns>THe list of generated ball objects.</returns>
-    public List<GameObject> Generate(GameObject parent, int ballCount)
+    /// <param name="ballCount">The number of balls to generate.</param>
+    /// <param name="prefix">Quick and dirty was to load the type of ball from resources.</param>
+    /// <returns>The list of generated ball objects.</returns>
+    public List<GameObject> Generate(GameObject parent, int ballCount, string prefix)
     {
         List<GameObject> balls = new List<GameObject>();
         GameObject go;
@@ -25,6 +26,7 @@ public class BallGenerator
 
             // Random ball prefab.
             StringBuilder sb = new StringBuilder();
+            sb.Append(prefix);
             sb.Append("Ball");
             sb.Append(Random.Range(1, 16));
 
