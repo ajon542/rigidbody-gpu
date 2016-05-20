@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections.Generic;
 
 /// <summary>
 /// Example of running a simple compute shader to fill a buffer.
@@ -25,6 +26,9 @@ public class IntegrateParticle : MonoBehaviour
 
     private int bufferSize;
     private Particle[] particles;
+
+    public int ballCount = 5000;
+    private List<GameObject> balls = new List<GameObject>();
 
     private void Start()
     {

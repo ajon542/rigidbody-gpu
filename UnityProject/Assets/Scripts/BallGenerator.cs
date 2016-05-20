@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-public class GenerateBalls : MonoBehaviour
+public class BallGenerator : MonoBehaviour
 {
     public int ballCount = 5000;
     private List<GameObject> balls = new List<GameObject>();
