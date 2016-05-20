@@ -6,8 +6,6 @@ using System.Collections.Generic;
 /// </summary>
 public class IntegrateParticle : MonoBehaviour
 {
-    public GameObject gameObject;
-
     struct Particle
     {
         public float mass;
@@ -27,8 +25,8 @@ public class IntegrateParticle : MonoBehaviour
     private int bufferSize;
     private Particle[] particles;
 
-    public int ballCount = 5000;
-    private List<GameObject> balls = new List<GameObject>();
+    public int ballCount = 4;
+    private List<GameObject> balls;
 
     private void Start()
     {
@@ -42,21 +40,24 @@ public class IntegrateParticle : MonoBehaviour
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
-        Particle particle = new Particle();
-        particle.mass = 2;
-        particle.position = new Vector3(0, 0, 0);
-        particle.velocity = new Vector3(1, 0, 0);
-        particle.acceleration = new Vector3(-1, 0, 0);
-        particle.damping = 0;
+        // Generate the specified number of balls game objects.
+        BallGenerator bg = new BallGenerator();
+        balls = bg.Generate(gameObject, ballCount, "Custom");
 
-        // Create some initial data.
-        Particle[] initialBufferData = new Particle[]
+        // Generate the particles, using the positions of the ball game objects.
+        Particle[] initialBufferData = new Particle[ballCount];
+        for(int i = 0; i < ballCount; ++i)
         {
-            particle,
-            particle,
-            particle,
-            particle,
-        };
+            Particle particle = new Particle();
+            particle.mass = 2;
+            particle.position = balls[i].transform.position;
+            particle.velocity = new Vector3(1, 0, 0);
+            particle.acceleration = new Vector3(-1, 0, 0);
+            particle.damping = 0;
+            initialBufferData[i] = particle;
+        }
+
+        // Set the data.
         buffer.SetData(initialBufferData);
 
         // Set the buffer on the compute shader.
@@ -80,13 +81,11 @@ public class IntegrateParticle : MonoBehaviour
             buffer.GetData(particles);
 
             // Display the data.
-            //for (int i = 0; i < bufferSize; i++)
-            //{
-            //    Debug.Log(particles[i].position);
-            //}
-            Debug.Log(particles[0].position);
-
-            gameObject.transform.position = particles[0].position;
+            for (int i = 0; i < bufferSize; i++)
+            {
+                Debug.Log(particles[i].position);
+                balls[i].transform.position = particles[i].position;
+            }
         }
     }
 
