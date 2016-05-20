@@ -19,17 +19,19 @@ public class IntegrateParticle : MonoBehaviour
     private ComputeBuffer buffer;
 
     private int kernelHandle;
-    private int groupCount = 1;
-    private int threadCount = 4;
+    private int groupCount = 10;
+    private int threadCount = 16;
 
     private int bufferSize;
     private Particle[] particles;
 
-    public int ballCount = 4;
+    private int ballCount;
     private List<GameObject> balls;
 
     private void Start()
     {
+        ballCount = 16 * groupCount;
+
         // Calculate the buffer size.
         bufferSize = groupCount * threadCount;
         particles = new Particle[bufferSize];
@@ -51,8 +53,8 @@ public class IntegrateParticle : MonoBehaviour
             Particle particle = new Particle();
             particle.mass = 2;
             particle.position = balls[i].transform.position;
-            particle.velocity = new Vector3(1, 0, 0);
-            particle.acceleration = new Vector3(-1, 0, 0);
+            particle.velocity = new Vector3(0, 1, 0);
+            particle.acceleration = new Vector3(0, -1, 0);
             particle.damping = 0;
             initialBufferData[i] = particle;
         }
@@ -83,7 +85,7 @@ public class IntegrateParticle : MonoBehaviour
             // Display the data.
             for (int i = 0; i < bufferSize; i++)
             {
-                Debug.Log(particles[i].position);
+                //Debug.Log(particles[i].position);
                 balls[i].transform.position = particles[i].position;
             }
         }

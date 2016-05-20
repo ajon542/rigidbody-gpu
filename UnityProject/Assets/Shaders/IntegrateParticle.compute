@@ -13,7 +13,7 @@ RWStructuredBuffer<Particle> buffer;
 float duration;
 float3 forceAccum = float3(0, 0, 0);
 
-[numthreads(4,1,1)]
+[numthreads(16,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
 {
     // Update linear position.
