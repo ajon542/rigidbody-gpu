@@ -20,7 +20,7 @@ public class IntegrateParticle : MonoBehaviour
 
     private int kernelHandle;
     private int groupCount = 10;
-    private int threadCount = 16;
+    private int threadCount = 1024;
 
     private int bufferSize;
     private Particle[] particles;
@@ -30,7 +30,7 @@ public class IntegrateParticle : MonoBehaviour
 
     private void Start()
     {
-        ballCount = 16 * groupCount;
+        ballCount = 1024 * groupCount;
 
         // Calculate the buffer size.
         bufferSize = groupCount * threadCount;
