@@ -1,16 +1,19 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Conway's Game Of Life.
+/// </summary>
 public class TextureExample : MonoBehaviour
 {
     public ComputeShader shader, shaderCopy;
 
-    RenderTexture tex, texCopy;
+    private RenderTexture tex, texCopy;
 
     private int textureSize = 1024;
     private int threadGroupCount = 128;
 
-    void Start()
+    private void Start()
     {
         tex = new RenderTexture(textureSize, textureSize, 0);
         tex.enableRandomWrite = true;
@@ -20,9 +23,6 @@ public class TextureExample : MonoBehaviour
         texCopy.enableRandomWrite = true;
         texCopy.Create();
 
-        float value = Random.value;
-        Debug.Log(value);
-        shader.SetFloat("seed", value);
         shader.SetTexture(0, "tex", tex);
         shader.Dispatch(0, threadGroupCount, threadGroupCount, 1);
 
@@ -31,7 +31,7 @@ public class TextureExample : MonoBehaviour
         shaderCopy.Dispatch(0, threadGroupCount, threadGroupCount, 1);
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
         int w = Screen.width / 2;
         int h = Screen.height / 2;
@@ -40,7 +40,7 @@ public class TextureExample : MonoBehaviour
         GUI.DrawTexture(new Rect(w - s / 2, h - s / 2, s, s), texCopy);
     }
 
-    void Update()
+    private void Update()
     {
         //if(Input.GetKeyDown(KeyCode.A))
         {
@@ -51,14 +51,14 @@ public class TextureExample : MonoBehaviour
         }
     }
 
-    void Swap(ref RenderTexture a, ref RenderTexture b)
+    private void Swap(ref RenderTexture a, ref RenderTexture b)
     {
         RenderTexture tmp = a;
         a = b;
         b = tmp;
     }
 
-    void OnDestroy()
+    private void OnDestroy()
     {
         tex.Release();
         texCopy.Release();
