@@ -22,7 +22,7 @@ public class BallGenerator
         for (int i = 0; i < ballCount; ++i)
         {
             // Random position.
-            Vector3 randomPosition = new Vector3(Random.value * 20, Random.value * 20, Random.value * 20);
+            Vector3 randomPosition = new Vector3(Random.value * 100, Random.value * 100, Random.value * 100);
 
             // Random ball prefab.
             StringBuilder sb = new StringBuilder();
