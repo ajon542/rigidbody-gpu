@@ -19,7 +19,7 @@ public class IntegrateParticle : MonoBehaviour
     private ComputeBuffer buffer;
 
     private int kernelHandle;
-    private int groupCount = 10;
+    private int groupCount = 20;
     private int threadCount = 1024;
 
     private int bufferSize;

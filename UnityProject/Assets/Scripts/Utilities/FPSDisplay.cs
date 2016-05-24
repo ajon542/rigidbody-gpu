@@ -1,18 +1,22 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Simple FPS display.
+/// </summary>
 public class FPSDisplay : MonoBehaviour
 {
-    float deltaTime = 0.0f;
+    private float deltaTime = 0.0f;
 
-    void Update()
+    private void Update()
     {
         deltaTime += (Time.deltaTime - deltaTime) * 0.1f;
     }
 
-    void OnGUI()
+    private void OnGUI()
     {
-        int w = Screen.width, h = Screen.height;
+        int w = Screen.width;
+        int h = Screen.height;
 
         GUIStyle style = new GUIStyle();
 
