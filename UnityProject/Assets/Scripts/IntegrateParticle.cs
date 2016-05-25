@@ -19,7 +19,7 @@ public class IntegrateParticle : MonoBehaviour
     private ComputeBuffer buffer;
 
     private int kernelHandle;
-    private int groupCount = 20;
+    private int groupCount = 10;
     private int threadCount = 1024;
 
     private int bufferSize;
@@ -53,8 +53,8 @@ public class IntegrateParticle : MonoBehaviour
             Particle particle = new Particle();
             particle.mass = 2;
             particle.position = balls[i].transform.position;
-            particle.velocity = new Vector3(0, 1, 0);
-            particle.acceleration = new Vector3(0, -1, 0);
+            particle.velocity = new Vector3(0, 10, 0);
+            particle.acceleration = new Vector3(0, -10f, 0);
             particle.damping = 0;
             initialBufferData[i] = particle;
         }
