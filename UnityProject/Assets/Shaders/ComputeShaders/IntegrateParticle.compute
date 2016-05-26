@@ -11,7 +11,7 @@ struct Particle
 
 RWStructuredBuffer<Particle> buffer;
 float duration;
-float3 forceAccum = float3(0, 0, 0);
+float3 forceAccum;
 
 [numthreads(1024,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
@@ -22,7 +22,7 @@ void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThrea
 
     // Work out the acceleration from the force.
     float3 resultingAcc = buffer[dispatchID.x].acceleration;
-    float3 scaledForce = forceAccum * (1 / buffer[dispatchID.x].mass);
+    float3 scaledForce = forceAccum * (1.0 / buffer[dispatchID.x].mass);
     resultingAcc += scaledForce;
 
     // Update linear velocity from the acceleration.

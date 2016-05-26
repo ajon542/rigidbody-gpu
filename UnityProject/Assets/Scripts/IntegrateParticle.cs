@@ -73,6 +73,11 @@ public class IntegrateParticle : MonoBehaviour
         {
             // Fill the buffer using the compute shader.
             shader.SetFloat("duration", Time.deltaTime);
+
+            // SetVector does not appear to work.
+            //shader.SetVector("forceAccum", new Vector3(10, 0, 0));
+            shader.SetFloats("forceAccum", new float[] { 10, 0, 0 });
+
             shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
             // Obtain the data.
