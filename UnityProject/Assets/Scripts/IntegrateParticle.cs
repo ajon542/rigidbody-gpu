@@ -14,6 +14,7 @@ public class IntegrateParticle : MonoBehaviour
         public Vector3 acceleration;
         public float damping;
     }
+    private int particleStructSize = 11;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
@@ -37,7 +38,7 @@ public class IntegrateParticle : MonoBehaviour
         particles = new Particle[bufferSize];
 
         // Create compute buffer.
-        buffer = new ComputeBuffer(bufferSize * 11, sizeof(float));
+        buffer = new ComputeBuffer(bufferSize, sizeof(float) * particleStructSize);
 
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
