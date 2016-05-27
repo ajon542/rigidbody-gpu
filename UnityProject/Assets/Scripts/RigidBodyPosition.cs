@@ -4,7 +4,7 @@ using System.Collections.Generic;
 /// <summary>
 /// Example of running a simple compute shader to fill a buffer.
 /// </summary>
-public class IntegrateParticle : MonoBehaviour
+public class RigidBodyPosition : MonoBehaviour
 {
     struct Particle
     {
