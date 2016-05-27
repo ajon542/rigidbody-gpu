@@ -16,19 +16,35 @@ float3 forceAccum;
 [numthreads(1024,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
 {
-    // Update linear position.
-    float3 scaledVelocity = buffer[dispatchID.x].velocity * duration;
-    buffer[dispatchID.x].position += scaledVelocity;
+    // TODO:
+    // Calculate angular acceleration from torque inputs.
+    //Vector3 angularAcceleration = InverseInertiaTensorWorld.Transform(TorqueAccum);
 
-    // Work out the acceleration from the force.
-    float3 resultingAcc = buffer[dispatchID.x].acceleration;
-    float3 scaledForce = forceAccum * (1.0 / buffer[dispatchID.x].mass);
-    resultingAcc += scaledForce;
+    // TODO:
+    // Update angular velocity from both acceleration and impulse.
+    //Rotation.AddScaledVector(angularAcceleration, duration);
 
-    // Update linear velocity from the acceleration.
-    float3 scaledAcceleration = resultingAcc * duration;
-    buffer[dispatchID.x].velocity += scaledAcceleration;
-
+    // TODO:
     // Impose drag.
-    //Velocity *= System.Math.Pow(Damping, duration);
+    //Rotation *= System.Math.Pow(AngularDamping, duration);
+
+    // TODO:
+    // Update angular position.
+    //Orientation.AddScaledVector(Rotation, duration);
+
+    // TODO:
+    // Normalise the orientation, and update the matrices with the new position and orientation.
+    //CalculateDerivedData();
+}
+
+void CalculateDerivedData()
+{
+    // TODO:
+    //Orientation.Normalize();
+
+    // Calculate the transform matrix for the body.
+    //CalculateTransformMatrix(TransformMatrix, Position, Orientation);
+
+    // Calculate the inertiaTensor in world space.
+    //TransformInertiaTensor(InverseInertiaTensorWorld, Orientation, InverseInertiaTensor, TransformMatrix);
 }
