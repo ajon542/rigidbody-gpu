@@ -8,33 +8,31 @@ public class RigidBodyOrientation : MonoBehaviour
 {
     struct Particle
     {
-        public float mass;
-        public Vector3 position;
-        public Vector3 velocity;
-        public Vector3 acceleration;
-        public float damping;
+        public Vector3 force;
+        public Vector3 pf;
+        public Vector3 torque;
     }
-    private int particleStructSize = 11;
+    private int particleStructSize = 9;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
 
     private int kernelHandle;
-    private int groupCount = 10;
-    private int threadCount = 1024;
+    private int groupCount = 1;
+    private int threadCount = 4;
 
     private int bufferSize;
     private Particle[] particles;
 
-    private int ballCount;
-    private List<GameObject> balls;
+    public GameObject cube;
+    private int cubeCount;
 
     private void Start()
     {
-        ballCount = 1024 * groupCount;
+        cubeCount = threadCount * groupCount;
 
         // Calculate the buffer size.
-        bufferSize = groupCount * threadCount;
+        bufferSize = cubeCount;
         particles = new Particle[bufferSize];
 
         // Create compute buffer.
@@ -43,20 +41,13 @@ public class RigidBodyOrientation : MonoBehaviour
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
-        // Generate the specified number of balls game objects.
-        BallGenerator bg = new BallGenerator();
-        balls = bg.Generate(gameObject, ballCount, "Custom");
-
         // Generate the particles, using the positions of the ball game objects.
-        Particle[] initialBufferData = new Particle[ballCount];
-        for(int i = 0; i < ballCount; ++i)
+        Particle[] initialBufferData = new Particle[cubeCount];
+        for (int i = 0; i < cubeCount; ++i)
         {
             Particle particle = new Particle();
-            particle.mass = 2;
-            particle.position = balls[i].transform.position;
-            particle.velocity = new Vector3(0, 10, 0);
-            particle.acceleration = new Vector3(0, -10f, 0);
-            particle.damping = 0;
+            particle.force = new Vector3(0, 0, 1);
+            particle.pf = new Vector3(-1, 0, -1);
             initialBufferData[i] = particle;
         }
 
@@ -69,14 +60,10 @@ public class RigidBodyOrientation : MonoBehaviour
 
     private void Update()
     {
-        //if (Input.GetKeyDown(KeyCode.A))
+        if (Input.GetKeyDown(KeyCode.A))
         {
             // Fill the buffer using the compute shader.
             shader.SetFloat("duration", Time.deltaTime);
-
-            // SetVector does not appear to work.
-            //shader.SetVector("forceAccum", new Vector3(10, 0, 0));
-            shader.SetFloats("forceAccum", new float[] { 10, 0, 0 });
 
             shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
@@ -91,8 +78,7 @@ public class RigidBodyOrientation : MonoBehaviour
             // Display the data.
             for (int i = 0; i < bufferSize; i++)
             {
-                //Debug.Log(particles[i].position);
-                balls[i].transform.position = particles[i].position;
+                Debug.Log(particles[i].torque);
             }
         }
     }

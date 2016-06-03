@@ -2,20 +2,23 @@
 
 struct Particle
 {
-    float mass;
-    float3 position;
-    float3 velocity;
-    float3 acceleration;
-    float damping;
+    float3 force;
+    float3 pf;
+    float3 torque;
 };
 
 RWStructuredBuffer<Particle> buffer;
 float duration;
-float3 forceAccum;
 
-[numthreads(1024,1,1)]
+[numthreads(4,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
 {
+    // Calculate torque (T = pF x F).
+    float3 torque = cross(buffer[dispatchID.x].pf, buffer[dispatchID.x].force);
+    buffer[dispatchID.x].torque = torque;
+
+
+
     // TODO:
     // Calculate angular acceleration from torque inputs.
     //Vector3 angularAcceleration = InverseInertiaTensorWorld.Transform(TorqueAccum);
