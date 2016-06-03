@@ -1,4 +1,4 @@
-﻿Shader "Custom/GrabPass Distortion" {
+﻿Shader "Samples/GrabPassDistortion/GrabPass Distortion" {
 
     Properties {
         _DistortionTexture ("DistortionTexture", 2D) = "black" {}
@@ -13,7 +13,7 @@
             "RenderType"="Transparent"
         }
 
-        Blend SrcAlpha OneMinusSrcAlpha
+        //Blend SrcAlpha OneMinusSrcAlpha
         Lighting Off
         Fog { Mode Off }
         ZWrite Off
