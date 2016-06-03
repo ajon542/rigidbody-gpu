@@ -49,8 +49,8 @@ fixed4 frag (v2f i) : COLOR {
     float4 distColor = tex2D(_DistortionTexture, TRANSFORM_TEX(distUV, _DistortionTexture));
 
     // Use the distortion texture to calculate the grab texture coordinates.
-    float u = (i.screenuv.xy.r + ((distColor.r * 1.0 - 0.5) * _DistortionValue));
-    float v = (i.screenuv.xy.g + ((distColor.g * 1.0 - 0.5) * _DistortionValue));
+    float u = (i.screenuv.xy.r + ((distColor.r - 0.5) * _DistortionValue));
+    float v = (i.screenuv.xy.g + ((distColor.g - 0.5) * _DistortionValue));
     float2 grabUV = float2(u, v);
 
     // Sample the grab texture.
