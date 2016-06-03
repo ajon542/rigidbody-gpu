@@ -1,13 +1,17 @@
 #ifndef GRABPASSDISTORTION_GCINC
 #define GRABPASSDISTORTION_GCINC
 
-// _GrabTexture contains the contents of the screen where the object is about to be drawn.
+// ----------------------------------------------------------------------------
+// Variables
+// ----------------------------------------------------------------------------
 sampler2D _GrabTexture;
-
 uniform float _DistortionValue;
 uniform sampler2D _DistortionTexture;
 uniform float4 _DistortionTexture_ST;
 
+// ----------------------------------------------------------------------------
+// Data Structures
+// ----------------------------------------------------------------------------
 struct appdata_t {
     float4 vertex  : POSITION;
     half2 texcoord : TEXCOORD0;
