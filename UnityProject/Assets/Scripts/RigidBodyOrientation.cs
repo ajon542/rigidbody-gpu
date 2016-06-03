@@ -6,6 +6,10 @@ using System.Collections.Generic;
 /// </summary>
 public class RigidBodyOrientation : MonoBehaviour
 {
+    public GameObject cube;
+    public Vector3 force = new Vector3(0, 0, 1);
+    public Vector3 pointOfForce = new Vector3(1, 0, -1);
+
     struct Particle
     {
         public Vector3 force;
@@ -24,7 +28,6 @@ public class RigidBodyOrientation : MonoBehaviour
     private int bufferSize;
     private Particle[] particles;
 
-    public GameObject cube;
     private int cubeCount;
 
     private void Start()
@@ -46,8 +49,8 @@ public class RigidBodyOrientation : MonoBehaviour
         for (int i = 0; i < cubeCount; ++i)
         {
             Particle particle = new Particle();
-            particle.force = new Vector3(0, 0, 1);
-            particle.pf = new Vector3(-1, 0, -1);
+            particle.force = force;
+            particle.pf = pointOfForce;
             initialBufferData[i] = particle;
         }
 
@@ -60,27 +63,13 @@ public class RigidBodyOrientation : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.A))
-        {
-            // Fill the buffer using the compute shader.
-            shader.SetFloat("duration", Time.deltaTime);
+        shader.SetFloat("duration", Time.deltaTime);
 
-            shader.Dispatch(kernelHandle, groupCount, 1, 1);
+        shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
-            // Obtain the data.
-            // NOTE: This is inefficient as it is essentially copying the data from the GPU.
-            // Depending on what is being done, copying the data to system memory does not
-            // even need to occur. For example, if we wanted to use the buffer in a shader,
-            // we could simply do "material.SetBuffer("buffer", buffer);". Alternatively, we
-            // could pass the buffer along to another compute shader.
-            buffer.GetData(particles);
+        buffer.GetData(particles);
 
-            // Display the data.
-            for (int i = 0; i < bufferSize; i++)
-            {
-                Debug.Log(particles[i].torque);
-            }
-        }
+        cube.transform.RotateAround(Vector3.zero, particles[0].torque, 30 * Time.deltaTime);
     }
 
     private void OnDestroy()
