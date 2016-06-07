@@ -5,10 +5,53 @@ struct Particle
     float3 force;
     float3 pf;
     float3 torque;
+    float4 rotation;
 };
 
 RWStructuredBuffer<Particle> buffer;
 float duration;
+
+float3x3 I = float3x3(
+   1, 0, 0, // first row (not column as in GLSL!)
+   0, 1, 0, // second row
+   0, 0, 1  // third row
+);
+
+float3x3 RotationMatrixFromQuaternion(float4 q)
+{
+    // Row 0
+    float r00 = 1 - (2 * q.y * q.y) - (2 * q.z * q.z);
+    float r10 = (2 * q.x * q.y) - (2 * q.w * q.z);
+    float r20 = (2 * q.x * q.z) + (2 * q.w * q.x);
+
+    // Row 1
+    float r01 = (2 * q.x * q.y) + (2 * q.w * q.z);
+    float r11 = 1 - (2 * q.x * q.x) - (2 * q.z * q.z);
+    float r21 = (2 * q.y * q.z) - (2 * q.w * q.x);
+
+    // Row 2
+    float r02 = (2 * q.x * q.z) - (2 * q.w * q.y);
+    float r12 = (2 * q.y * q.z) + (2 * q.w * q.x);
+    float r22 = 1 - (2 * q.x * q.x) - (2 * q.y * q.y);
+
+    float3x3 r = float3x3(
+       r00, r10, r20, // first row (not column as in GLSL!)
+       r01, r11, r21, // second row
+       r02, r12, r22  // third row
+    );
+
+    return r;
+}
+
+float3x3 Inverse(float3x3 m)
+{
+    // TODO: https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
+    return float3x3(
+       0, 0, 0, // first row (not column as in GLSL!)
+       0, 0, 0, // second row
+       0, 0, 0  // third row
+    );
+}
 
 [numthreads(4,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
@@ -17,7 +60,9 @@ void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThrea
     float3 torque = cross(buffer[dispatchID.x].pf, buffer[dispatchID.x].force);
     buffer[dispatchID.x].torque = torque;
 
-
+    float3x3 r = RotationMatrixFromQuaternion(buffer[dispatchID.x].rotation);
+    float3x3 tmp = mul(r, Inverse(I));
+    float3x3 invI = mul(tmp, transpose(r));
 
     // TODO:
     // Calculate angular acceleration from torque inputs.

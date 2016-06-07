@@ -15,8 +15,9 @@ public class RigidBodyOrientation : MonoBehaviour
         public Vector3 force;
         public Vector3 pf;
         public Vector3 torque;
+        public Vector4 rotation;
     }
-    private int particleStructSize = 9;
+    private int particleStructSize = 13;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
@@ -51,6 +52,7 @@ public class RigidBodyOrientation : MonoBehaviour
             Particle particle = new Particle();
             particle.force = force;
             particle.pf = pointOfForce;
+            particle.rotation = new Vector4(Quaternion.identity.x, Quaternion.identity.y, Quaternion.identity.z, Quaternion.identity.w);
             initialBufferData[i] = particle;
         }
 
