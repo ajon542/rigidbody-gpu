@@ -5,17 +5,12 @@ struct Particle
     float3 force;
     float3 pf;
     float3 torque;
-    float4 rotation;
+    float3 rotation;
+    float4 orientation;
 };
 
 RWStructuredBuffer<Particle> buffer;
 float duration;
-
-float3x3 I = float3x3(
-   1, 0, 0, // first row (not column as in GLSL!)
-   0, 1, 0, // second row
-   0, 0, 1  // third row
-);
 
 float3x3 RotationMatrixFromQuaternion(float4 q)
 {
@@ -45,12 +40,61 @@ float3x3 RotationMatrixFromQuaternion(float4 q)
 
 float3x3 Inverse(float3x3 m)
 {
-    // TODO: https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
-    return float3x3(
-       0, 0, 0, // first row (not column as in GLSL!)
-       0, 0, 0, // second row
-       0, 0, 0  // third row
-    );
+    // https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
+    float a =  (m[1][1] * m[2][2] - m[1][2] * m[2][1]);
+    float b = -(m[1][0] * m[2][2] - m[1][2] * m[2][0]);
+    float c =  (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
+    float d = -(m[0][1] * m[2][2] - m[0][2] * m[2][1]);
+    float e =  (m[0][0] * m[2][2] - m[0][2] * m[2][0]);
+    float f = -(m[0][0] * m[2][1] - m[0][1] * m[2][0]);
+    float g =  (m[0][1] * m[1][2] - m[0][2] * m[1][1]);
+    float h = -(m[0][0] * m[1][2] - m[0][2] * m[1][0]);
+    float i =  (m[0][0] * m[1][1] - m[0][1] * m[1][0]);
+
+    float det = 1 / (m[0][0] * a + b * m[0][1] + c * m[0][2]);
+
+    float3x3 im;
+    im[0][0] = a * det;
+    im[0][1] = d * det;
+    im[0][2] = g * det;
+    im[1][0] = b * det;
+    im[1][1] = e * det;
+    im[1][2] = h * det;
+    im[2][0] = c * det;
+    im[2][1] = f * det;
+    im[2][2] = i * det;
+
+    return im;
+}
+
+float4 QuaternionMultiply(float4 lhs, float4 rhs)
+{
+    float4 result;
+
+    result.w = lhs.w * rhs.w - lhs.x * rhs.x -
+               lhs.y * rhs.y - lhs.z * rhs.z;
+    result.x = lhs.w * rhs.x + lhs.x * rhs.w +
+               lhs.y * rhs.z - lhs.z * rhs.y;
+    result.y = lhs.w * rhs.y + lhs.y * rhs.w +
+               lhs.z * rhs.x - lhs.x * rhs.z;
+    result.z = lhs.w * rhs.z + lhs.z * rhs.w +
+               lhs.x * rhs.y - lhs.y * rhs.x;
+
+    return result;
+}
+
+float4 AddScaledVector(float4 q, float3 v, float scale)
+{
+    float4 tmp = float4(v.x * scale, v.y * scale, v.z * scale, 0);
+
+    float4 result = QuaternionMultiply(tmp, q);
+
+    q.w += result.w * 0.5;
+    q.x += result.x * 0.5;
+    q.y += result.y * 0.5;
+    q.z += result.z * 0.5;
+
+    return q;
 }
 
 [numthreads(4,1,1)]
@@ -60,9 +104,26 @@ void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThrea
     float3 torque = cross(buffer[dispatchID.x].pf, buffer[dispatchID.x].force);
     buffer[dispatchID.x].torque = torque;
 
-    float3x3 r = RotationMatrixFromQuaternion(buffer[dispatchID.x].rotation);
+    float3x3 I = float3x3(
+        1, 0, 0, // first row (not column as in GLSL!)
+        0, 1, 0, // second row
+        0, 0, 1  // third row
+    );
+
+    float3x3 r = RotationMatrixFromQuaternion(buffer[dispatchID.x].orientation);
     float3x3 tmp = mul(r, Inverse(I));
     float3x3 invI = mul(tmp, transpose(r));
+
+    float3 angularAcceleration = mul(invI, torque);
+    float3 scaledAcceleration = angularAcceleration * duration;
+    buffer[dispatchID.x].rotation += scaledAcceleration;
+
+    buffer[dispatchID.x].orientation = AddScaledVector(buffer[dispatchID.x].orientation, buffer[dispatchID.x].rotation, duration);
+
+    buffer[dispatchID.x].rotation = buffer[dispatchID.x].rotation * pow(0.7, duration);
+
+    buffer[dispatchID.x].torque = 0;
+    buffer[dispatchID.x].force = 0;
 
     // TODO:
     // Calculate angular acceleration from torque inputs.

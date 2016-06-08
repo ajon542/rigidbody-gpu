@@ -26,7 +26,9 @@ public class Matrix3x3
         float h = -(m[0, 0] * m[1, 2] - m[0, 2] * m[1, 0]);
         float i =  (m[0, 0] * m[1, 1] - m[0, 1] * m[1, 0]);
 
-        float det = 1 / (m[0, 0] * a + b * m[0, 1] + c * m[0, 2]);
+        float denominator = (m[0, 0] * a + b * m[0, 1] + c * m[0, 2]);
+        Debug.Log("denominator: " + denominator);
+        float det = 1 / denominator;
 
         float[,] im = new float[3, 3];
         im[0, 0] = a * det;
@@ -57,9 +59,10 @@ public class RigidBodyOrientation : MonoBehaviour
         public Vector3 force;
         public Vector3 pf;
         public Vector3 torque;
-        public Vector4 rotation;
+        public Vector3 rotation;
+        public Vector4 orientation;
     }
-    private int particleStructSize = 13;
+    private int particleStructSize = 16;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
@@ -94,7 +97,8 @@ public class RigidBodyOrientation : MonoBehaviour
             Particle particle = new Particle();
             particle.force = force;
             particle.pf = pointOfForce;
-            particle.rotation = new Vector4(Quaternion.identity.x, Quaternion.identity.y, Quaternion.identity.z, Quaternion.identity.w);
+            particle.rotation = new Vector3(0, 0, 0);
+            particle.orientation = new Vector4(0, 0, 0, 1);
             initialBufferData[i] = particle;
         }
 
@@ -107,14 +111,14 @@ public class RigidBodyOrientation : MonoBehaviour
 
         Matrix3x3 m = new Matrix3x3();
         m.m[0, 0] = 1;
-        m.m[0, 1] = 2;
-        m.m[0, 2] = 3;
-        m.m[1, 0] = 3;
+        m.m[0, 1] = 0;
+        m.m[0, 2] = 0;
+        m.m[1, 0] = 0;
         m.m[1, 1] = 1;
-        m.m[1, 2] = -7;
-        m.m[2, 0] = 2;
-        m.m[2, 1] = 8;
-        m.m[2, 2] = 3;
+        m.m[1, 2] = 0;
+        m.m[2, 0] = 0;
+        m.m[2, 1] = 0;
+        m.m[2, 2] = 1;
         m.Print();
         Matrix3x3 inverse = new Matrix3x3();
         inverse.m = m.Invert();
@@ -129,7 +133,15 @@ public class RigidBodyOrientation : MonoBehaviour
 
         buffer.GetData(particles);
 
-        cube.transform.RotateAround(Vector3.zero, particles[0].torque, 30 * Time.deltaTime);
+        //if (Input.GetKeyDown(KeyCode.A))
+        //{
+        //    Debug.Log("x: " + particles[0].orientation.x);
+        //    Debug.Log("y: " + particles[0].orientation.y);
+        //    Debug.Log("z: " + particles[0].orientation.z);
+        //    Debug.Log("w: " + particles[0].orientation.w);
+        //}
+        //cube.transform.RotateAround(Vector3.zero, particles[0].torque, 30 * Time.deltaTime);
+        cube.transform.rotation = new Quaternion(particles[0].orientation.x, particles[0].orientation.y, particles[0].orientation.z, particles[0].orientation.w);
     }
 
     private void OnDestroy()
