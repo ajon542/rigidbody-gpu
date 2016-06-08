@@ -15,7 +15,7 @@ public class RigidBodyOrientation : MonoBehaviour
     {
         public float mass;
         public Vector3 force;
-        public Vector3 pf;
+        public Vector3 pointOfForce;
         public Vector3 torque;
         public Vector3 rotation;
         public Vector4 orientation;
@@ -55,7 +55,7 @@ public class RigidBodyOrientation : MonoBehaviour
             RigidBody rigidBody = new RigidBody();
             rigidBody.mass = mass;
             rigidBody.force = force;
-            rigidBody.pf = pointOfForce;
+            rigidBody.pointOfForce = pointOfForce;
             rigidBody.rotation = new Vector3(0, 0, 0);
             rigidBody.orientation = new Vector4(0, 0, 0, 1);
             initialBufferData[i] = rigidBody;

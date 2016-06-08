@@ -4,7 +4,7 @@ struct RigidBody
 {
     float mass;
     float3 force;
-    float3 pf;
+    float3 pointOfForce;
     float3 torque;
     float3 rotation;
     float4 orientation;
@@ -105,8 +105,8 @@ float4 AddScaledVector(float4 q, float3 v, float scale)
 [numthreads(4,1,1)]
 void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThreadID)
 {
-    // Calculate torque (T = pF x F).
-    float3 torque = cross(buffer[dispatchID.x].pf, buffer[dispatchID.x].force);
+    // Calculate torque (T = pointOfForce x F).
+    float3 torque = cross(buffer[dispatchID.x].pointOfForce, buffer[dispatchID.x].force);
     buffer[dispatchID.x].torque = torque;
 
     // Inertia tensor for a cube.
