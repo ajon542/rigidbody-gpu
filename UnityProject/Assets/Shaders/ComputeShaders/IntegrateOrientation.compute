@@ -12,6 +12,7 @@ struct Particle
 RWStructuredBuffer<Particle> buffer;
 float duration;
 
+// Calculate the rotation matrix from a quaternion.
 float3x3 RotationMatrixFromQuaternion(float4 q)
 {
     // Row 0
@@ -30,7 +31,7 @@ float3x3 RotationMatrixFromQuaternion(float4 q)
     float r22 = 1 - (2 * q.x * q.x) - (2 * q.y * q.y);
 
     float3x3 r = float3x3(
-       r00, r10, r20, // first row (not column as in GLSL!)
+       r00, r10, r20, // first row
        r01, r11, r21, // second row
        r02, r12, r22  // third row
     );
@@ -38,9 +39,10 @@ float3x3 RotationMatrixFromQuaternion(float4 q)
     return r;
 }
 
+// Calculate the inverse of matrix m.
+// https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
 float3x3 Inverse(float3x3 m)
 {
-    // https://en.wikipedia.org/wiki/Invertible_matrix#Inversion_of_3.C3.973_matrices
     float a =  (m[1][1] * m[2][2] - m[1][2] * m[2][1]);
     float b = -(m[1][0] * m[2][2] - m[1][2] * m[2][0]);
     float c =  (m[1][0] * m[2][1] - m[1][1] * m[2][0]);
@@ -67,6 +69,7 @@ float3x3 Inverse(float3x3 m)
     return im;
 }
 
+// Multiply two quaternions.
 float4 QuaternionMultiply(float4 lhs, float4 rhs)
 {
     float4 result;
@@ -83,6 +86,7 @@ float4 QuaternionMultiply(float4 lhs, float4 rhs)
     return result;
 }
 
+// Add a scaled vector3 to a quaternion.
 float4 AddScaledVector(float4 q, float3 v, float scale)
 {
     float4 tmp = float4(v.x * scale, v.y * scale, v.z * scale, 0);
@@ -110,50 +114,23 @@ void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThrea
         0, 0, 1  // third row
     );
 
+    // Calculate angular acceleration from torque inputs.
     float3x3 r = RotationMatrixFromQuaternion(buffer[dispatchID.x].orientation);
     float3x3 tmp = mul(r, Inverse(I));
     float3x3 invI = mul(tmp, transpose(r));
-
     float3 angularAcceleration = mul(invI, torque);
+
+    // Update angular velocity from the angular acceleration.
     float3 scaledAcceleration = angularAcceleration * duration;
     buffer[dispatchID.x].rotation += scaledAcceleration;
 
-    buffer[dispatchID.x].orientation = AddScaledVector(buffer[dispatchID.x].orientation, buffer[dispatchID.x].rotation, duration);
-
+    // Impose drag.
     buffer[dispatchID.x].rotation = buffer[dispatchID.x].rotation * pow(0.7, duration);
 
+    // Update angular position.
+    buffer[dispatchID.x].orientation = AddScaledVector(buffer[dispatchID.x].orientation, buffer[dispatchID.x].rotation, duration);
+
+    // Clear the torque and force.
     buffer[dispatchID.x].torque = 0;
     buffer[dispatchID.x].force = 0;
-
-    // TODO:
-    // Calculate angular acceleration from torque inputs.
-    //Vector3 angularAcceleration = InverseInertiaTensorWorld.Transform(TorqueAccum);
-
-    // TODO:
-    // Update angular velocity from both acceleration and impulse.
-    //Rotation.AddScaledVector(angularAcceleration, duration);
-
-    // TODO:
-    // Impose drag.
-    //Rotation *= System.Math.Pow(AngularDamping, duration);
-
-    // TODO:
-    // Update angular position.
-    //Orientation.AddScaledVector(Rotation, duration);
-
-    // TODO:
-    // Normalise the orientation, and update the matrices with the new position and orientation.
-    //CalculateDerivedData();
-}
-
-void CalculateDerivedData()
-{
-    // TODO:
-    //Orientation.Normalize();
-
-    // Calculate the transform matrix for the body.
-    //CalculateTransformMatrix(TransformMatrix, Position, Orientation);
-
-    // Calculate the inertiaTensor in world space.
-    //TransformInertiaTensor(InverseInertiaTensorWorld, Orientation, InverseInertiaTensor, TransformMatrix);
 }
