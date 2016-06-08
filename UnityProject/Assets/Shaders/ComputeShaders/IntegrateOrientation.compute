@@ -108,6 +108,14 @@ void CSMain(int3 threadID : SV_GroupThreadID, int3 dispatchID : SV_DispatchThrea
     float3 torque = cross(buffer[dispatchID.x].pf, buffer[dispatchID.x].force);
     buffer[dispatchID.x].torque = torque;
 
+    // Inertia tensor for a cube.
+    // a = 1/12*mass*(dy^2 + dz^2);
+    // b = 1/12*mass*(dx^2 + dz^2);
+    // c = 1/12*mass*(dx^2 + dy^2);
+    // [ a, 0, 0 ]
+    // [ 0, b, 0 ]
+    // [ 0, 0, c ]
+    //
     float3x3 I = float3x3(
         1, 0, 0, // first row (not column as in GLSL!)
         0, 1, 0, // second row
