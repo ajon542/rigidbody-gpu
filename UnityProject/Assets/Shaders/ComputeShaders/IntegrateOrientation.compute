@@ -1,6 +1,6 @@
 ﻿#pragma kernel CSMain
 
-struct Particle
+struct RigidBody
 {
     float3 force;
     float3 pf;
@@ -9,7 +9,7 @@ struct Particle
     float4 orientation;
 };
 
-RWStructuredBuffer<Particle> buffer;
+RWStructuredBuffer<RigidBody> buffer;
 float duration;
 
 // Calculate the rotation matrix from a quaternion.

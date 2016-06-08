@@ -10,7 +10,7 @@ public class RigidBodyOrientation : MonoBehaviour
     public Vector3 force = new Vector3(0, 0, 1);
     public Vector3 pointOfForce = new Vector3(1, 0, -1);
 
-    struct Particle
+    struct RigidBody
     {
         public Vector3 force;
         public Vector3 pf;
@@ -18,7 +18,7 @@ public class RigidBodyOrientation : MonoBehaviour
         public Vector3 rotation;
         public Vector4 orientation;
     }
-    private int particleStructSize = 16;
+    private int rigidBodyStructSize = 16;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
@@ -28,7 +28,7 @@ public class RigidBodyOrientation : MonoBehaviour
     private int threadCount = 4;
 
     private int bufferSize;
-    private Particle[] particles;
+    private RigidBody[] rigidBodies;
 
     private int cubeCount;
 
@@ -38,24 +38,24 @@ public class RigidBodyOrientation : MonoBehaviour
 
         // Calculate the buffer size.
         bufferSize = cubeCount;
-        particles = new Particle[bufferSize];
+        rigidBodies = new RigidBody[bufferSize];
 
         // Create compute buffer.
-        buffer = new ComputeBuffer(bufferSize, sizeof(float) * particleStructSize);
+        buffer = new ComputeBuffer(bufferSize, sizeof(float) * rigidBodyStructSize);
 
         // Obtain the handle to the kernel to run.
         kernelHandle = shader.FindKernel("CSMain");
 
         // Generate the particles, using the positions of the ball game objects.
-        Particle[] initialBufferData = new Particle[cubeCount];
+        RigidBody[] initialBufferData = new RigidBody[cubeCount];
         for (int i = 0; i < cubeCount; ++i)
         {
-            Particle particle = new Particle();
-            particle.force = force;
-            particle.pf = pointOfForce;
-            particle.rotation = new Vector3(0, 0, 0);
-            particle.orientation = new Vector4(0, 0, 0, 1);
-            initialBufferData[i] = particle;
+            RigidBody rigidBody = new RigidBody();
+            rigidBody.force = force;
+            rigidBody.pf = pointOfForce;
+            rigidBody.rotation = new Vector3(0, 0, 0);
+            rigidBody.orientation = new Vector4(0, 0, 0, 1);
+            initialBufferData[i] = rigidBody;
         }
 
         // Set the data.
@@ -71,14 +71,14 @@ public class RigidBodyOrientation : MonoBehaviour
 
         shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
-        buffer.GetData(particles);
+        buffer.GetData(rigidBodies);
 
         cube.transform.rotation = new Quaternion
         (
-            particles[0].orientation.x,
-            particles[0].orientation.y,
-            particles[0].orientation.z,
-            particles[0].orientation.w
+            rigidBodies[0].orientation.x,
+            rigidBodies[0].orientation.y,
+            rigidBodies[0].orientation.z,
+            rigidBodies[0].orientation.w
         );
     }
 
