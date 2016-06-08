@@ -7,18 +7,20 @@ using System.Collections.Generic;
 public class RigidBodyOrientation : MonoBehaviour
 {
     public GameObject cube;
+    public float mass = 10;
     public Vector3 force = new Vector3(0, 0, 1);
     public Vector3 pointOfForce = new Vector3(1, 0, -1);
 
     struct RigidBody
     {
+        public float mass;
         public Vector3 force;
         public Vector3 pf;
         public Vector3 torque;
         public Vector3 rotation;
         public Vector4 orientation;
     }
-    private int rigidBodyStructSize = 16;
+    private int rigidBodyStructSize = 17;
 
     public ComputeShader shader;
     private ComputeBuffer buffer;
@@ -51,6 +53,7 @@ public class RigidBodyOrientation : MonoBehaviour
         for (int i = 0; i < cubeCount; ++i)
         {
             RigidBody rigidBody = new RigidBody();
+            rigidBody.mass = mass;
             rigidBody.force = force;
             rigidBody.pf = pointOfForce;
             rigidBody.rotation = new Vector3(0, 0, 0);
