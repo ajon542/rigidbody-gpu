@@ -8,4 +8,5 @@ Rigid Body Simulation on the GPU
 ###### Please see the wiki for further information
 
 ## Screenshots
+Unity example - 10240 spheres with colliders attached
 ![Alt text](https://github.com/ajon542/rigidbody-gpu/blob/master/UnityProject/Screenshots/CPU.png "Unity CPU Example")
