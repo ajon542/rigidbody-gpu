@@ -70,7 +70,28 @@ public class RigidBodyOrientation : MonoBehaviour
 
     private void Update()
     {
+        Vector3 pointOfForce = Vector3.zero;
+
         shader.SetFloat("duration", Time.deltaTime);
+
+        if (Input.GetMouseButtonDown(0))
+        {
+            // create a ray going into the scene from the screen location the user clicked at
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            // the raycast hit info will be filled by the Physics.Raycast() call further
+            RaycastHit hit;
+
+            // perform a raycast using our new ray. 
+            // If the ray collides with something solid in the scene, the "hit" structure will
+            // be filled with collision information
+            if (Physics.Raycast(ray, out hit))
+            {
+                Debug.Log(hit.point);
+
+                pointOfForce = hit.point;
+            }
+        }
 
         shader.Dispatch(kernelHandle, groupCount, 1, 1);
 
@@ -83,6 +104,14 @@ public class RigidBodyOrientation : MonoBehaviour
             rigidBodies[0].orientation.z,
             rigidBodies[0].orientation.w
         );
+
+        if (pointOfForce != Vector3.zero)
+        {
+            rigidBodies[0].pointOfForce = pointOfForce;
+            rigidBodies[0].force = force;
+        }
+
+        buffer.SetData(rigidBodies);
     }
 
     private void OnDestroy()
