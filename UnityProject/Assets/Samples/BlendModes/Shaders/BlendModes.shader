@@ -32,7 +32,7 @@ Shader "Samples/BlendModes/GrabPass Blend Modes" {
                 #pragma vertex vert
                 #pragma fragment frag
 
-                #include "BlendModesGrabPass.cginc"
+                #include "BlendModes.cginc"
 
                 ENDCG
             }
