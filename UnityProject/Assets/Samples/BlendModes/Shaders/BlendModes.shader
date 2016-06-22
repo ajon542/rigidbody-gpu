@@ -1,5 +1,5 @@
 ﻿
-Shader "Samples/BlendModes/GrabPass Blend Modes" {
+Shader "Samples/BlendModes/Blend Modes" {
 
     Properties {
         _TintColor ("Tint Color", Color) = (1.0,1.0,1.0,1.0)
@@ -7,7 +7,8 @@ Shader "Samples/BlendModes/GrabPass Blend Modes" {
         [Enum(BlendModes)] _Blend ("Blend mode", int) = 0
     }
 
-    Category {
+    SubShader {
+
         Tags {
             "Queue" = "Transparent"
             "IgnoreProjector" = "True"
@@ -19,23 +20,20 @@ Shader "Samples/BlendModes/GrabPass Blend Modes" {
         ZWrite Off
         ZTest Always
 
-        SubShader {
+        GrabPass { "_GrabTexture" }
 
-            GrabPass { "_GrabTexture" }
+        Pass {
 
-            Pass {
+            Blend SrcAlpha OneMinusSrcAlpha
 
-                Blend SrcAlpha OneMinusSrcAlpha
+            CGPROGRAM
 
-                CGPROGRAM
+            #pragma vertex vert
+            #pragma fragment frag
 
-                #pragma vertex vert
-                #pragma fragment frag
+            #include "BlendModes.cginc"
 
-                #include "BlendModes.cginc"
-
-                ENDCG
-            }
+            ENDCG
         }
     }
 }
