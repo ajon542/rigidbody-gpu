@@ -13,9 +13,8 @@ public class BallGenerator : IObjectGenerator
     /// </remarks>
     /// <param name="parent">The parent game object for each ball.</param>
     /// <param name="ballCount">The number of balls to generate.</param>
-    /// <param name="prefix">Quick and dirty was to load the type of ball from resources.</param>
     /// <returns>The list of generated ball objects.</returns>
-    public List<GameObject> Generate(GameObject parent, int ballCount, string prefix)
+    public List<GameObject> Generate(GameObject parent, int ballCount)
     {
         List<GameObject> balls = new List<GameObject>();
         GameObject go;
@@ -26,7 +25,7 @@ public class BallGenerator : IObjectGenerator
 
             // Random ball prefab.
             StringBuilder sb = new StringBuilder();
-            sb.Append(prefix);
+            sb.Append("Custom");
             sb.Append("Ball");
             sb.Append(Random.Range(1, 16));
 

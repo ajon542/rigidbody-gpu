@@ -45,11 +45,11 @@ public class RigidBodyPosition : MonoBehaviour
 
         // Generate the specified number of balls game objects.
         IObjectGenerator bg = new BallGenerator();
-        balls = bg.Generate(gameObject, ballCount, "Custom");
+        balls = bg.Generate(gameObject, ballCount);
 
         // Generate the particles, using the positions of the ball game objects.
         Particle[] initialBufferData = new Particle[ballCount];
-        for(int i = 0; i < ballCount; ++i)
+        for (int i = 0; i < ballCount; ++i)
         {
             Particle particle = new Particle();
             particle.mass = 2;
