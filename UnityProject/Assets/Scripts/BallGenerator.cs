@@ -3,13 +3,13 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text;
 
-public class BallGenerator
+public class BallGenerator : IObjectGenerator
 {
     /// <summary>
     /// Generates a list of ball game objects.
     /// </summary>
     /// <remarks>
-    /// It is up to the called to destroy the game objects.
+    /// It is up to the caller to destroy the game objects.
     /// </remarks>
     /// <param name="parent">The parent game object for each ball.</param>
     /// <param name="ballCount">The number of balls to generate.</param>

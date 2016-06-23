@@ -44,7 +44,7 @@ public class RigidBodyPosition : MonoBehaviour
         kernelHandle = shader.FindKernel("CSMain");
 
         // Generate the specified number of balls game objects.
-        BallGenerator bg = new BallGenerator();
+        IObjectGenerator bg = new BallGenerator();
         balls = bg.Generate(gameObject, ballCount, "Custom");
 
         // Generate the particles, using the positions of the ball game objects.
