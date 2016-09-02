@@ -1,16 +1,14 @@
-﻿Shader "Samples/JuliaSet/Julia Set"
-{
-    Properties
-    {
+﻿Shader "Samples/JuliaSet/Julia Set" {
+    Properties {
         _MainTex ("Texture", 2D) = "white" {}
+        _Bounds ("Bounds", Float) = 2
     }
-    SubShader
-    {
+
+    SubShader {
         Tags { "RenderType"="Opaque" }
         LOD 100
 
-        Pass
-        {
+        Pass {
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

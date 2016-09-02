@@ -6,6 +6,7 @@
 // ----------------------------------------------------------------------------
 sampler2D _MainTex;
 float4 _MainTex_ST;
+float _Bounds;
 
 // ----------------------------------------------------------------------------
 // Data Structures
@@ -98,14 +99,17 @@ v2f vert (appdata v) {
 // ----------------------------------------------------------------------------
 fixed4 frag (v2f i) : SV_Target {
 
-    // TODO fix the calcs
-    float xDelta = 4;
-    float yDelta = 4;
+    float xMin = -_Bounds;
+    float xMax = _Bounds;
+    float yMin = -_Bounds;
+    float yMax = _Bounds; 
+    float xDelta = xMax - xMin;
+    float yDelta = yMax - yMin;
 
     // Initialize the dynamic system;
     Complex z;
-    z.real = -2 + i.uv.x * xDelta;
-    z.imag = -2 + i.uv.y * yDelta;
+    z.real = -_Bounds + i.uv.x * xDelta;
+    z.imag = -_Bounds + i.uv.y * yDelta;
 
     Complex c;
     c.real = -0.8;
