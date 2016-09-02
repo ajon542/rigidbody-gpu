@@ -1,0 +1,30 @@
+﻿#pragma kernel CSMain
+
+RWTexture2D<float4> tex;
+
+// Create Julia Set texture.
+//
+[numthreads(8,8,1)]
+void CSMain (uint2 id : SV_DispatchThreadID)
+{
+    // Some concentric square pattern to make it a little more interesting.
+    if(id.x >= 100 && id.x < 900 && id.y >= 100 && id.y < 900)
+    {
+        tex[id] = float4(0, 0, 0, 1);
+    }
+
+    if(id.x >= 200 && id.x < 800 && id.y >= 200 && id.y < 800)
+    {
+        tex[id] = float4(1, 1, 1, 1);
+    }
+
+    if(id.x >= 300 && id.x < 700 && id.y >= 300 && id.y < 700)
+    {
+        tex[id] = float4(0, 0, 0, 1);
+    }
+
+    if(id.x >= 400 && id.x < 600 && id.y >= 400 && id.y < 600)
+    {
+        tex[id] = float4(1, 1, 1, 1);
+    }
+}
