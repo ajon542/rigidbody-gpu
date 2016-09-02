@@ -28,29 +28,60 @@ struct Complex {
 // ----------------------------------------------------------------------------
 // Functions
 // ----------------------------------------------------------------------------
+
+// Get the result of adding two complex numbers.
 Complex ComplexAdd (Complex a, Complex b) {
     Complex result;
     result.real = a.real + b.real;
+    result.imag = a.imag + b.imag;
     return result;
 }
 
+// Gets the result of multiplying two complex numbers.
 Complex ComplexMul (Complex a, Complex b) {
     Complex result;
     result.real = (a.real * b.real) - (a.imag * b.imag);
-    result.imag = (2 * a.imag * b.imag);
+    result.imag = (a.real * b.imag) + (a.imag * b.real);
     return result;
 }
 
-Complex QuadraticIteration (Complex z, Complex c) {
-    float tmpReal = (z.real * z.real) - (z.imag * z.imag) + c.real;
-    float tmpImag = (2 * z.real * z.imag) + c.imag;
-
-    Complex result;
-    result.real = tmpReal;
-    result.imag = tmpImag;
-
-    return result;
+// Gets the absolute value squared (or magnitude squared) of a complex number.
+float ComplexAbs(Complex a) {
+    return (a.real * a.real) + (a.imag * a.imag);
 }
+
+// Perform a quadratic iteration to generate the Julia set.
+int QuadraticIteration (Complex z, Complex c) {
+    int iterations = 0;
+    while (iterations < 1024 && ComplexAbs(z) < 20) {
+        Complex tmp = ComplexMul(z, z);
+        z = ComplexAdd(tmp, c);
+        iterations++;
+    }
+    return iterations;
+}
+
+// Convert a color in range [0, 255] to range [0, 1].
+float4 ConvertColor (int r, int g, int b) {
+    return float4(r/255.0, g/255.0, b/255.0, 1);
+}
+
+// Generate a color for the Julia set.
+float4 GetColor(int iterations) {
+    float value = 3.5 * iterations;
+    int component = fmod(value, 255);
+
+    if (value > 700) {
+        return ConvertColor(255, 255, component);
+    }
+    else if (value > 255) {
+        return ConvertColor(255, component, 0);
+    }
+    else {
+        return ConvertColor(component, 0, 0);
+    }
+}
+
 
 // ----------------------------------------------------------------------------
 // Vertex Shader
@@ -66,8 +97,25 @@ v2f vert (appdata v) {
 // Pixel Shader
 // ----------------------------------------------------------------------------
 fixed4 frag (v2f i) : SV_Target {
-    // sample the texture
-    fixed4 col = tex2D(_MainTex, i.uv);
+
+    // TODO fix the calcs
+    float xDelta = 4;
+    float yDelta = 4;
+
+    // Initialize the dynamic system;
+    Complex z;
+    z.real = -2 + i.uv.x * xDelta;
+    z.imag = -2 + i.uv.y * yDelta;
+
+    Complex c;
+    c.real = -0.8;
+    c.imag = 0.156;
+
+    // Perform the iterations.
+    int iterations = QuadraticIteration(z, c);
+
+    // Obtain the color.
+    fixed4 col = GetColor(iterations);
     return col;
 }
 
